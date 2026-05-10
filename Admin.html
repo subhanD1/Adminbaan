@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin User System</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    /* 🔥 WALLPAPER BACKGROUND */
+    background:url("https://files.catbox.moe/wk2zi8.webp") no-repeat center center/cover;
+
+    color:white;
+}
+
+/* Overlay gelap supaya teks jelas */
+body::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+}
+
+.card{
+    position:relative;
+    width:95%;
+    max-width:420px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(20px);
+    padding:20px;
+    border-radius:20px;
+    text-align:center;
+    z-index:1;
+}
+
+.logo{
+    width:80px;
+    margin-bottom:10px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:6px 0;
+    border:none;
+    border-radius:10px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border:none;
+    border-radius:20px;
+    background:linear-gradient(45deg,#00c6ff,#0072ff);
+    color:white;
+    cursor:pointer;
+}
+
+.delete{
+    background:#ff4d4d;
+    margin-top:5px;
+}
+
+.logout{
+    background:#ff4d4d;
+}
+
+.hidden{ display:none; }
+
+.dayBox{
+    font-size:22px;
+    font-weight:bold;
+    margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="card" id="loginBox">
+    <!-- 🔥 LOGO -->
+    <img src="https://files.catbox.moe/sxxtad.webp" class="logo">
+
+    <h2>🔐 Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Masuk</button>
+</div>
+
+<!-- ADMIN -->
+<div class="card hidden" id="adminPanel">
+    <img src="https://files.catbox.moe/4s3vxv.webp" class="logo">
+
+    <h2>🛠 UNTUK ADMIN BAAN</h2>
+
+    <h3>Buat User</h3>
+    <input type="text" id="newUser" placeholder="Username">
+    <input type="password" id="newPass" placeholder="Password">
+    <button onclick="createUser()">Tambah User</button>
+
+    <h3>Daftar User</h3>
+    <div id="userList"></div>
+
+    <h3>Atur Day</h3>
+    <input type="number" id="setDay" placeholder="Jumlah Day">
+    <button onclick="setDays()">Simpan Day</button>
+
+    <div class="dayBox">
+        📅 Total Day: <span id="adminDay">0</span>
+    </div>
+
+    <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<!-- USER -->
+<div class="card hidden" id="userPanel">
+    <img src="https://files.catbox.moe/0t2uub.webp" class="logo">
+
+    <h2>👤 User</h2>
+
+    <div class="dayBox">
+        📅 Total Day: <span id="userDay">0</span>
+    </div>
+
+    <button onclick="goWebsite()">Masuk Website</button>
+</div>
+
+<script>
+
+// LOGIN
+function login(){
+    let user = username.value;
+    let pass = password.value;
+
+    if(user==="BAAN" && pass==="BAAN123"){
+        loginBox.classList.add("hidden");
+        adminPanel.classList.remove("hidden");
+        loadUsers();
+        loadDays();
+    }
+    else if(localStorage.getItem("user_"+user) === pass){
+        loginBox.classList.add("hidden");
+        userPanel.classList.remove("hidden");
+        loadDays();
+    }
+    else{
+        alert("Login gagal!");
+    }
+}
+
+// BUAT USER
+function createUser(){
+    let user = newUser.value;
+    let pass = newPass.value;
+
+    if(user && pass){
+        localStorage.setItem("user_"+user, pass);
+        loadUsers();
+        alert("User berhasil dibuat!");
+    }
+}
+
+// TAMPILKAN USER + HAPUS
+function loadUsers(){
+    userList.innerHTML="";
+    for(let i=0;i<localStorage.length;i++){
+        let key = localStorage.key(i);
+        if(key.startsWith("user_")){
+            let name = key.replace("user_","");
+            userList.innerHTML += `
+                <div>
+                    👤 ${name}
+                    <button class="delete" onclick="deleteUser('${name}')">
+                        Hapus
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+// HAPUS USER
+function deleteUser(name){
+    localStorage.removeItem("user_"+name);
+    loadUsers();
+}
+
+// SET DAY
+function setDays(){
+    let day = setDay.value;
+    if(day){
+        localStorage.setItem("totalDays", day);
+        loadDays();
+        alert("Day disimpan!");
+    }
+}
+
+// LOAD DAY
+function loadDays(){
+    let day = localStorage.getItem("totalDays") || 0;
+    adminDay.innerText = day;
+    userDay.innerText = day;
+}
+
+// REDIRECT
+function goWebsite(){
+    window.location.href = "https://serene-biscotti-ba536d.netlify.app";
+}
+
+// LOGOUT
+function logout(){
+    location.reload();
+}
+
+</script>
+
+</body>
+</html>
